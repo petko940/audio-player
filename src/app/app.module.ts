@@ -3,16 +3,14 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { PlaylistComponent } from './playlist/playlist.component';
-import { ControlComponent } from './control/control.component';
-import { VolumeComponent } from './volume/volume.component';
+import { TruncatePipe } from './audio-player/truncate.pipe';
+import { AudioPlayerComponent } from './audio-player/audio-player.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PlaylistComponent,
-    ControlComponent,
-    VolumeComponent
+    TruncatePipe,
+    AudioPlayerComponent
   ],
   imports: [
     BrowserModule,
