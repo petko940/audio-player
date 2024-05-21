@@ -1,7 +1,7 @@
-<div class="flex justify-center">
+<div class="flex justify-center mt-16">
 
     <div *ngIf="filesLoaded" data-aos="fade-right" data-aos-duration="3000"
-        class="w-[40vw] h-80 mt-16 border-2 border-white bg-slate-500">
+        class="w-[40vw] h-80 border-2 border-white bg-slate-500">
 
         <div class="text-center text-white text-xl mb-7 mt-10">Now playing: {{ currentSongNamePlay }}</div>
         <audio #audioPlayer class="w-[90%] mx-auto mt-10"> </audio>
@@ -26,8 +26,8 @@
             </div>
         </div>
 
-        <div class="flex justify-center mt-4 mb-8 text-slate-50">
-            Volume {{ (volume * 100).toFixed(0) }}%
+        <div class="flex justify-center items-center mt-4 mb-8 text-slate-50">
+            Volume {{ (volume * 100).toFixed(0) }}% 
             <input type="range" min="0" max="1" step="0.01" [(ngModel)]="volume" (input)="adjustVolume()"
                 (wheel)="adjustVolumeWithScroll($event)">
         </div>
@@ -44,7 +44,7 @@
 
     </div>
 
-    <div class="w-[35vw] h-96 mt-16 border-2 border-white bg-slate-600">
+    <div class="w-[35vw] h-96 border-2 border-white bg-slate-600">
         <h1 *ngIf="filesLoaded" class="text-white text-center text-2xl my-4">
             Playlist
         </h1>

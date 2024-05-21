@@ -19,10 +19,9 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
     volume: number = 0.1;
     songDuration: number = 0;
     currentTimeSong: number = 0;
-
+ 
     ngOnInit(): void {
         AOS.init();
-        this.audioPlayer.nativeElement.volume = 0.1; // Set volume to 10%
         this.addPlayEventListener();
     }
 
