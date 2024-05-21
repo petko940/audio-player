@@ -15,22 +15,25 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
     currentSongNamePlay: string = "";
     isPlaying: boolean = false;
     progress: number = 0;
-    progressInterval: any; 
-    volume: number = 0.3;
+    progressInterval: any;
+    volume: number = 0.1;
     songDuration: number = 0;
     currentTimeSong: number = 0;
 
     ngOnInit(): void {
         AOS.init();
+        this.audioPlayer.nativeElement.volume = 0.1; // Set volume to 10%
         this.addPlayEventListener();
     }
 
     ngAfterViewChecked(): void {
         AOS.refresh();
-        if (!this.audioPlayer) return;
-        this.audioPlayer.nativeElement.addEventListener('play', this.startUpdatingProgress.bind(this));  
+        if (this.audioPlayer && !this.audioPlayer.nativeElement.hasAttribute('data-listener-added')) {
+            this.audioPlayer.nativeElement.addEventListener('play', this.startUpdatingProgress.bind(this));
+            this.audioPlayer.nativeElement.setAttribute('data-listener-added', 'true');
+        }
     }
-    
+
     addPlayEventListener(): void {
         if (this.audioPlayer) {
             this.audioPlayer.nativeElement.addEventListener('play', this.startUpdatingProgress.bind(this));
@@ -58,12 +61,14 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
         if (this.isPlaying) {
             audio.pause();
             this.isPlaying = false;
+            this.stopUpdatingProgress();
         } else {
             if (audio.src === "") {
-                this.playSong(this.currentSongIndex);
+                this.playSong(0);
             } else {
                 audio.play().then(() => {
                     this.isPlaying = true;
+                    this.startUpdatingProgress();
                 }).catch(error => {
                     this.isPlaying = false;
                 });
@@ -93,6 +98,7 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
         const audio = this.audioPlayer.nativeElement;
         audio.pause();
         audio.currentTime = 0;
+        this.progress = 0
         this.isPlaying = false;
     }
 
@@ -115,7 +121,12 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
             }, 1000);
         }
     }
-    
+
+    stopUpdatingProgress(): void {
+        clearInterval(this.progressInterval);
+        this.progressInterval = null;
+    }
+
     updateProgress(): void {
         const audio = this.audioPlayer.nativeElement;
         if (audio.duration > 0) {
@@ -140,9 +151,26 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
         this.audioPlayer.nativeElement.volume = this.volume;
     }
 
+    adjustVolumeWithScroll(event: WheelEvent): void {
+        event.preventDefault();
+
+        const delta = Math.sign(event.deltaY);
+        const step = 0.05;
+
+        let newVolume = this.volume - (delta * step);
+        newVolume = Math.min(Math.max(newVolume, 0), 1);
+
+        this.volume = newVolume;
+        this.adjustVolume();
+    }
+
     updateCurrentTime(): void {
         const audio = this.audioPlayer.nativeElement;
         this.currentTimeSong = audio.currentTime;
     }
-    
+
+    isCurrentSong(index: number): boolean {
+        return index === this.currentSongIndex && this.isPlaying;
+    }
+
 }
