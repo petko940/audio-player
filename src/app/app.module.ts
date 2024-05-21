@@ -5,16 +5,20 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TruncatePipe } from './audio-player/truncate.pipe';
 import { AudioPlayerComponent } from './audio-player/audio-player.component';
+import { FormsModule } from '@angular/forms';
+import { SecondsToMmSsPipe } from './audio-player/seconds-to-mm-ss.pipe';
 
 @NgModule({
   declarations: [
     AppComponent,
     TruncatePipe,
-    AudioPlayerComponent
+    AudioPlayerComponent,
+    SecondsToMmSsPipe
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
