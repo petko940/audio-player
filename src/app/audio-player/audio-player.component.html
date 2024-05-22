@@ -1,7 +1,6 @@
 <div class="flex justify-center mt-16">
 
-    <div *ngIf="filesLoaded" data-aos="fade-right" data-aos-duration="3000"
-        class="w-[40vw] h-80 border-2 border-white bg-slate-500">
+    <div data-aos="fade-right" data-aos-duration="3000" class="w-[40vw] h-96 border-y-2 border-l-2 border-white bg-slate-500">
 
         <div class="text-center text-white text-xl mb-7 mt-10">Now playing: {{ currentSongNamePlay }}</div>
         <audio #audioPlayer class="w-[90%] mx-auto mt-10"> </audio>
@@ -27,7 +26,7 @@
         </div>
 
         <div class="flex justify-center items-center mt-4 mb-8 text-slate-50">
-            Volume {{ (volume * 100).toFixed(0) }}% 
+            Volume {{ (volume * 100).toFixed(0) }}%
             <input type="range" min="0" max="1" step="0.01" [(ngModel)]="volume" (input)="adjustVolume()"
                 (wheel)="adjustVolumeWithScroll($event)">
         </div>
@@ -42,6 +41,9 @@
             </div>
         </div>
 
+        <div class="h-32 flex flex-col justify-end">
+            <canvas #canvas class="w-full h-20"></canvas>
+        </div>
     </div>
 
     <div class="w-[35vw] h-96 border-2 border-white bg-slate-600">
@@ -53,7 +55,8 @@
             <input type="file" webkitdirectory multiple (change)="loadFolder($event)">
         </div>
 
-        <ul class="overflow-y-scroll h-[19.8rem] ml-4 text-green-100 text-lg select-none" *ngIf="filesLoaded" data-aos="fade-right">
+        <ul class="overflow-y-scroll h-[19.8rem] ml-4 text-green-100 text-lg select-none" *ngIf="filesLoaded"
+            data-aos="fade-right">
             <li *ngFor="let file of audioFiles; let i = index" (dblclick)="playSong(i)" class="cursor-pointer my-1"
                 [ngClass]="{ 'bg-green-500 text-white p-1': i === currentSongIndex }">
                 {{ i + 1 }}. <span>{{ file.name | truncate }}</span>
