@@ -19,7 +19,16 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
     volume: number = 0.1;
     songDuration: number = 0;
     currentTimeSong: number = 0;
- 
+
+    @ViewChild('canvas', { static: false }) canvas!: ElementRef<HTMLCanvasElement>;
+    audioContext!: AudioContext;
+    analyser!: AnalyserNode;
+    dataArray!: Uint8Array;
+    bufferLength!: number;
+    canvasContext!: CanvasRenderingContext2D;
+    animationFrameId!: number;
+
+
     ngOnInit(): void {
         AOS.init();
         this.addPlayEventListener();
@@ -27,7 +36,7 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
 
     ngAfterViewChecked(): void {
         AOS.refresh();
-        if (this.audioPlayer && !this.audioPlayer.nativeElement.hasAttribute('data-listener-added')) {
+        if (this.audioPlayer && !this.audioPlayer.nativeElement.hasAttribute('data-listener-added')) {            
             this.audioPlayer.nativeElement.addEventListener('play', this.startUpdatingProgress.bind(this));
             this.audioPlayer.nativeElement.setAttribute('data-listener-added', 'true');
         }
@@ -61,21 +70,28 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
             audio.pause();
             this.isPlaying = false;
             this.stopUpdatingProgress();
+            cancelAnimationFrame(this.animationFrameId);
         } else {
             if (audio.src === "") {
-                this.playSong(0);
+                this.playSong(0);                
             } else {
                 audio.play().then(() => {
                     this.isPlaying = true;
                     this.startUpdatingProgress();
+                    this.startVisualizer();                                                  
                 }).catch(error => {
                     this.isPlaying = false;
+                    cancelAnimationFrame(this.animationFrameId);                    
                 });
             }
         }
     }
 
     playSong(index: number): void {
+        if (this.isPlaying) {
+            this.stopSong();
+        } 
+
         this.currentSongIndex = index;
         const selectedSong = this.audioFiles[index];
         const audio = this.audioPlayer.nativeElement;
@@ -83,12 +99,13 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
 
         audio.src = selectedSong.url;
         audio.load();
-
         audio.play().then(() => {
             this.isPlaying = true;
             this.songDuration = audio.duration;
+            this.initVisualizer();            
         }).catch(error => {
             this.isPlaying = false;
+            cancelAnimationFrame(this.animationFrameId);
         });
 
     }
@@ -170,6 +187,59 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
 
     isCurrentSong(index: number): boolean {
         return index === this.currentSongIndex && this.isPlaying;
+    }
+
+    initVisualizer(): void {
+        if (!this.audioContext) {
+            this.audioContext = new AudioContext();
+        }
+
+        this.analyser = this.audioContext.createAnalyser();
+        const source = this.audioContext.createMediaElementSource(this.audioPlayer.nativeElement);
+        source.connect(this.analyser);
+        this.analyser.connect(this.audioContext.destination);
+
+        this.analyser.fftSize = 1024;
+        this.bufferLength = this.analyser.frequencyBinCount;
+        this.dataArray = new Uint8Array(this.bufferLength);
+
+        const canvas = this.canvas.nativeElement;
+        this.canvasContext = canvas.getContext('2d')!;
+
+        this.startVisualizer();
+    }
+
+    startVisualizer(): void {
+        const draw = () => {
+            this.animationFrameId = requestAnimationFrame(draw);
+
+            this.analyser.getByteFrequencyData(this.dataArray);
+
+            const canvas = this.canvas.nativeElement;
+            const width = canvas.width;
+            const height = canvas.height;
+
+            this.canvasContext.clearRect(0, 0, width, height);
+
+            const barWidth = (width / this.bufferLength) * 2.5;
+            let barHeight;
+            let x = 0;
+
+            const gradient = this.canvasContext.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, 'red');
+            gradient.addColorStop(1, 'green');
+
+            for (let i = 0; i < this.bufferLength; i++) {
+                barHeight = this.dataArray[i];
+
+                this.canvasContext.fillStyle = gradient;
+                this.canvasContext.fillRect(x, height - barHeight / 2, barWidth, barHeight / 2);
+
+                x += barWidth + 1;
+            }
+        };
+
+        draw();
     }
 
 }
