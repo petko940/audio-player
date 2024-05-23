@@ -1,11 +1,11 @@
-<div class="flex justify-center mt-16">
+<div class="flex justify-center mt-16 h-[80vh]">
 
-    <div data-aos="fade-right" data-aos-duration="3000" class="w-[40vw] h-96 border-y-2 border-l-2 border-white bg-slate-500">
+    <div *ngIf="filesLoaded" data-aos="fade-right" data-aos-duration="3000"
+        class="w-[40vw] h-[80vh] border-y-2 border-2 border-white rounded-md bg-slate-500">
 
-        <div class="text-center text-white text-xl mb-7 mt-10">Now playing: {{ currentSongNamePlay }}</div>
-        <audio #audioPlayer class="w-[90%] mx-auto mt-10"> </audio>
+        <audio #audioPlayer> </audio>
 
-        <div class="flex justify-center items-center gap-3">
+        <div class="flex justify-center items-center gap-3 mt-10">
             <div (click)="playPreviousSong()"
                 class="bg-blue-500 active:bg-blue-700 transition duration-200 rounded-full p-4 flex items-center justify-center w-12 h-12 cursor-pointer">
                 <i class="fa-solid fa-backward-step text-2xl text-white"></i>
@@ -35,30 +35,35 @@
             <div class="h-[100%] bg-gradient-to-r from-green-500 to-orange-500 rounded-md" [style.width.%]="progress">
             </div>
 
-            <div class="flex justify-evenly text-slate-100 gap-80">
+            <div class="flex justify-between text-slate-100">
                 <h1>{{ currentTimeSong | secondsToMmSs }}</h1>
                 <h1>{{ songDuration | secondsToMmSs }}</h1>
             </div>
         </div>
 
-        <div class="h-32 flex flex-col justify-end">
-            <canvas #canvas class="w-full h-20"></canvas>
+        <div class="text-center text-white text-xl mt-10 w-3/4 mx-auto">
+            Now playing: <span class="text-green-200 text-xl">{{ currentSongNamePlay }}</span>
         </div>
+
+        <canvas #canvas class="w-full h-20 sticky top-[100vh]"></canvas>
     </div>
 
-    <div class="w-[35vw] h-96 border-2 border-white bg-slate-600">
+    <!-- ------------------ -->
+
+    <div class="w-[35vw] h-96 border-2 border-white rounded-md bg-slate-600">
         <h1 *ngIf="filesLoaded" class="text-white text-center text-2xl my-4">
             Playlist
         </h1>
 
-        <div *ngIf="!filesLoaded" class="flex justify-center m-10">
+        <div *ngIf="!filesLoaded" class="flex justify-center items-center m-10">
+            <h2 class="text-white text-center text-2xl">Choose folder with songs</h2>
             <input type="file" webkitdirectory multiple (change)="loadFolder($event)">
         </div>
 
         <ul class="overflow-y-scroll h-[19.8rem] ml-4 text-green-100 text-lg select-none" *ngIf="filesLoaded"
             data-aos="fade-right">
             <li *ngFor="let file of audioFiles; let i = index" (dblclick)="playSong(i)" class="cursor-pointer my-1"
-                [ngClass]="{ 'bg-green-500 text-white p-1': i === currentSongIndex }">
+                [ngClass]="{ 'bg-green-500 rounded-md text-white p-1': i === currentSongIndex }">
                 {{ i + 1 }}. <span>{{ file.name | truncate }}</span>
             </li>
         </ul>
