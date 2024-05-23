@@ -36,7 +36,7 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
 
     ngAfterViewChecked(): void {
         AOS.refresh();
-        if (this.audioPlayer && !this.audioPlayer.nativeElement.hasAttribute('data-listener-added')) {            
+        if (this.audioPlayer && !this.audioPlayer.nativeElement.hasAttribute('data-listener-added')) {
             this.audioPlayer.nativeElement.addEventListener('play', this.startUpdatingProgress.bind(this));
             this.audioPlayer.nativeElement.setAttribute('data-listener-added', 'true');
         }
@@ -49,6 +49,7 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
     }
 
     loadFolder(event: any): void {
+        event.preventDefault();
         const files = event.target.files;
         if (files && files.length > 0) {
             this.audioFiles = [];
@@ -73,15 +74,15 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
             cancelAnimationFrame(this.animationFrameId);
         } else {
             if (audio.src === "") {
-                this.playSong(0);                
+                this.playSong(0);
             } else {
                 audio.play().then(() => {
                     this.isPlaying = true;
                     this.startUpdatingProgress();
-                    this.startVisualizer();                                                  
+                    this.startVisualizer();
                 }).catch(error => {
                     this.isPlaying = false;
-                    cancelAnimationFrame(this.animationFrameId);                    
+                    cancelAnimationFrame(this.animationFrameId);
                 });
             }
         }
@@ -90,7 +91,7 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
     playSong(index: number): void {
         if (this.isPlaying) {
             this.stopSong();
-        } 
+        }
 
         this.currentSongIndex = index;
         const selectedSong = this.audioFiles[index];
@@ -102,12 +103,16 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
         audio.play().then(() => {
             this.isPlaying = true;
             this.songDuration = audio.duration;
-            this.initVisualizer();            
+            if (!this.analyser) {
+                this.initVisualizer();
+            } else {
+                this.startVisualizer();
+            }
+            this.isPlaying = true;
         }).catch(error => {
             this.isPlaying = false;
             cancelAnimationFrame(this.animationFrameId);
         });
-
     }
 
     stopSong(): void {
