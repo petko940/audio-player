@@ -101,6 +101,8 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
         audio.src = selectedSong.url;
         audio.load();
 
+        audio.volume = this.volume;
+
         audio.play().then(() => {
             this.isPlaying = true;
             this.songDuration = audio.duration;
@@ -217,6 +219,10 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
 
     startVisualizer(): void {
         const draw = () => {
+            if (!this.canvas || !this.canvas.nativeElement) {
+                return;
+            }
+
             this.animationFrameId = requestAnimationFrame(draw);
 
             this.analyser?.getByteFrequencyData(this.dataArray);
