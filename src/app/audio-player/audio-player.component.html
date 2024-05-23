@@ -1,6 +1,6 @@
-<div class="flex justify-center mt-16 h-[80vh]">
+<div class="flex justify-center mt-12 h-[80vh]">
 
-    <div *ngIf="filesLoaded" data-aos="fade-right" data-aos-duration="3000"
+    <div *ngIf="filesLoaded" data-aos="fade-left" data-aos-duration="800"
         class="w-[40vw] h-[80vh] border-y-2 border-2 border-white rounded-md bg-slate-500">
 
         <audio #audioPlayer> </audio>
@@ -50,23 +50,32 @@
 
     <!-- ------------------ -->
 
-    <div class="w-[35vw] h-96 border-2 border-white rounded-md bg-slate-600">
-        <h1 *ngIf="filesLoaded" class="text-white text-center text-2xl my-4">
-            Playlist
-        </h1>
+    <div>
+        <div class="w-[35vw] h-96 border-2 border-white rounded-t-md bg-slate-600">
+            <h1 *ngIf="filesLoaded" class="text-white text-center text-2xl my-4">
+                Playlist
+            </h1>
 
-        <div *ngIf="!filesLoaded" class="flex justify-center items-center m-10">
-            <h2 class="text-white text-center text-2xl">Choose folder with songs</h2>
-            <input type="file" webkitdirectory multiple (change)="loadFolder($event)">
+            <div *ngIf="!filesLoaded" class="flex flex-col justify-center items-center gap-5 m-10">
+                <h2 class="text-white text-center text-2xl">Choose folder with songs</h2>
+                <input class="mx-auto" type="file" webkitdirectory multiple (change)="loadFolder($event)">
+            </div>
+
+            <ul class="overflow-y-scroll h-[19.8rem] ml-4 text-green-100 text-lg select-none" *ngIf="filesLoaded"
+                data-aos="fade-right">
+                <li *ngFor="let file of audioFiles; let i = index" (dblclick)="playSong(i)" class="cursor-pointer my-1"
+                    [ngClass]="{ 'bg-green-500 rounded-md text-white p-1': i === currentSongIndex }">
+                    {{ i + 1 }}. <span>{{ file.name | truncate }}</span>
+                </li>
+            </ul>
         </div>
 
-        <ul class="overflow-y-scroll h-[19.8rem] ml-4 text-green-100 text-lg select-none" *ngIf="filesLoaded"
-            data-aos="fade-right">
-            <li *ngFor="let file of audioFiles; let i = index" (dblclick)="playSong(i)" class="cursor-pointer my-1"
-                [ngClass]="{ 'bg-green-500 rounded-md text-white p-1': i === currentSongIndex }">
-                {{ i + 1 }}. <span>{{ file.name | truncate }}</span>
-            </li>
-        </ul>
+        <div *ngIf="filesLoaded" class="w-full h-12 border-b-2 border-x-2 rounded-b-md flex justify-center items-center"
+            data-aos="fade-down" data-aos-duration="800">
+            <h1 (click)="resetPlaylist()" class="text-white select-none	 text cursor-pointer px-2 py-1 hover:bg-red-500 duration-300 rounded-md">
+                Clear playlist
+            </h1>
+        </div>
     </div>
 
 </div>

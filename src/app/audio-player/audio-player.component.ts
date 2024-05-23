@@ -21,8 +21,8 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
     currentTimeSong: number = 0;
 
     @ViewChild('canvas', { static: false }) canvas!: ElementRef<HTMLCanvasElement>;
-    audioContext!: AudioContext;
-    analyser!: AnalyserNode;
+    audioContext!: AudioContext | null;
+    analyser!: AnalyserNode | null;
     dataArray!: Uint8Array;
     bufferLength!: number;
     canvasContext!: CanvasRenderingContext2D;
@@ -100,6 +100,7 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
 
         audio.src = selectedSong.url;
         audio.load();
+
         audio.play().then(() => {
             this.isPlaying = true;
             this.songDuration = audio.duration;
@@ -218,7 +219,7 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
         const draw = () => {
             this.animationFrameId = requestAnimationFrame(draw);
 
-            this.analyser.getByteFrequencyData(this.dataArray);
+            this.analyser?.getByteFrequencyData(this.dataArray);
 
             const canvas = this.canvas.nativeElement;
             const width = canvas.width;
@@ -247,4 +248,20 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
         draw();
     }
 
+    resetPlaylist() {
+        this.audioFiles = [];
+        this.filesLoaded = false;
+        this.stopSong();
+        this.currentSongNamePlay = '';
+        this.currentSongIndex = -1;
+        this.currentTimeSong = 0;
+        this.songDuration = 0;
+        cancelAnimationFrame(this.animationFrameId);
+        this.analyser?.disconnect();
+        this.analyser = null;
+        this.audioContext?.close();
+        this.audioContext = null;
+        this.stopUpdatingProgress();
+        AOS.refresh();
+    }
 }
