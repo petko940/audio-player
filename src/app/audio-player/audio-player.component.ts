@@ -107,13 +107,15 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
         // if (this.isPlaying) {
         //     this.stopSong();
         // }
-
+        
         this.currentSongIndex = index;
         const selectedSong = this.audioFiles[index];
         const audio = this.audioPlayer.nativeElement;
         this.currentSongNamePlay = selectedSong.name.slice(0, -4);
         audio.src = selectedSong.url;
         audio.load();
+
+        document.title = this.currentSongNamePlay;
 
         audio.volume = this.volume;
 
@@ -139,6 +141,7 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
         this.currentTimeSong = 0;
         this.progress = 0
         this.isPlaying = false;
+        document.title = "Audio Player";
     }
 
     playNextSong(): void {
