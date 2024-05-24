@@ -19,6 +19,7 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
     volume: number = 0.1;
     songDuration: number = 0;
     currentTimeSong: number = 0;
+    noAudioFileFound: string = "";
 
     @ViewChild('canvas', { static: false }) canvas!: ElementRef<HTMLCanvasElement>;
     audioContext!: AudioContext | null;
@@ -51,7 +52,21 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
     loadFolder(event: any): void {
         event.preventDefault();
         const files = event.target.files;
+        let noAudioFile = true;
+        for (let file of files) {
+            if (file.type.startsWith('audio')) {
+                noAudioFile = false;
+                break;
+            }
+        }
+        
+        if (noAudioFile || files.length === 0) {
+            this.noAudioFileFound = "No audio file found. Please select another folder.";
+            return;
+        }
+        
         if (files && files.length > 0) {
+            this.noAudioFileFound = "";
             this.audioFiles = [];
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
@@ -89,15 +104,14 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
     }
 
     playSong(index: number): void {
-        if (this.isPlaying) {
-            this.stopSong();
-        }
+        // if (this.isPlaying) {
+        //     this.stopSong();
+        // }
 
         this.currentSongIndex = index;
         const selectedSong = this.audioFiles[index];
         const audio = this.audioPlayer.nativeElement;
         this.currentSongNamePlay = selectedSong.name.slice(0, -4);
-
         audio.src = selectedSong.url;
         audio.load();
 
@@ -122,18 +136,17 @@ export class AudioPlayerComponent implements OnInit, AfterViewChecked {
         const audio = this.audioPlayer.nativeElement;
         audio.pause();
         audio.currentTime = 0;
+        this.currentTimeSong = 0;
         this.progress = 0
         this.isPlaying = false;
     }
 
     playNextSong(): void {
-        if (this.audioFiles.length === 0) return;
         this.currentSongIndex = (this.currentSongIndex + 1) % this.audioFiles.length;
         this.playSong(this.currentSongIndex);
     }
 
     playPreviousSong(): void {
-        if (this.audioFiles.length === 0) return;
         this.currentSongIndex = (this.currentSongIndex - 1 + this.audioFiles.length) % this.audioFiles.length;
         this.playSong(this.currentSongIndex);
     }
