@@ -67,7 +67,7 @@
 
             <ul class="overflow-y-scroll h-[19.8rem] ml-4 text-green-100 text-lg select-none" *ngIf="filesLoaded"
                 data-aos="fade-right">
-                <li *ngFor="let file of audioFiles; let i = index" (dblclick)="playSong(i)" class="cursor-pointer my-1"
+                <li *ngFor="let file of audioFiles; let i = index" (c)="playSong(i)" class="cursor-pointer my-1"
                     [ngClass]="{ 'bg-green-500 rounded-md text-white p-1': i === currentSongIndex }">
                     {{ i + 1 }}. <span>{{ file.name | truncate }}</span>
                 </li>
